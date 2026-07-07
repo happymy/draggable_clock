@@ -1,11 +1,16 @@
 const PAGE_KEY = `clock-position-${window.location.hostname}`;
+let clockTimer = null;
 
 function savePosition(el) {
-  const pos = {
-    left: parseInt(el.style.left, 10) || 0,
-    top: parseInt(el.style.top, 10) || 0
-  };
-  localStorage.setItem(PAGE_KEY, JSON.stringify(pos));
+  try {
+    const pos = {
+      left: parseInt(el.style.left, 10) || 0,
+      top: parseInt(el.style.top, 10) || 0
+    };
+    localStorage.setItem(PAGE_KEY, JSON.stringify(pos));
+  } catch (e) {
+    /* localStorage 不可用或已满 */
+  }
 }
 
 function pad(n) {
@@ -17,17 +22,22 @@ function updateClock(display) {
   const h = pad(now.getHours());
   const m = pad(now.getMinutes());
   const s = pad(now.getSeconds());
-  display.innerHTML = `${h}:${m}<span class="seconds">:${s}</span>`;
+  display.firstChild.textContent = `${h}:${m}`;
+  display.lastChild.textContent = `:${s}`;
 }
 
 function createClock() {
   if (document.getElementById('draggable-clock')) return;
+  if (clockTimer) clearInterval(clockTimer);
 
   const el = document.createElement('div');
   el.id = 'draggable-clock';
 
   const display = document.createElement('span');
   display.className = 'clock-display';
+  display.appendChild(document.createTextNode(''));
+  display.appendChild(document.createElement('span'));
+  display.lastChild.className = 'seconds';
   el.appendChild(display);
 
   document.body.appendChild(el);
@@ -45,7 +55,7 @@ function createClock() {
   }
 
   updateClock(display);
-  setInterval(updateClock, 1000, display);
+  clockTimer = setInterval(updateClock, 1000, display);
 
   let isDragging = false;
   let hasDragged = false;
