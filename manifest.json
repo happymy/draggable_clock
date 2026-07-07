@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "可拖拽时钟刷新",
+  "version": "1.0",
+  "description": "可拖动的数字时钟（含秒），点击刷新页面",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
