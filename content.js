@@ -51,7 +51,7 @@ function createClock() {
       el.style.right = 'auto';
     }
   } catch (e) {
-    localStorage.removeItem(PAGE_KEY);
+    try { localStorage.removeItem(PAGE_KEY); } catch (e2) { /* 忽略 */ }
   }
 
   updateClock(display);
@@ -101,7 +101,6 @@ function createClock() {
   document.addEventListener('touchmove', function(e) {
     if (!isDragging) return;
     hasDragged = true;
-    e.preventDefault();
 
     const touch = e.touches[0];
     const x = touch.clientX - offsetX;
@@ -117,6 +116,12 @@ function createClock() {
 
   document.addEventListener('touchend', function() {
     isDragging = false;
+    if (hasDragged) savePosition(el);
+  });
+
+  document.addEventListener('touchcancel', function() {
+    isDragging = false;
+    el.style.cursor = 'move';
     if (hasDragged) savePosition(el);
   });
 
